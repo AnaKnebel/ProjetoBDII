@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema Alunos ADS</title>
+    <style>
+        body { font-family: Arial; padding: 20px; line-height: 1.6; }
+        .secao { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+        input { display: block; margin-bottom: 10px; padding: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Controle de Alunos e Notas</h1>
+
+    <div class="secao">
+        <h3>Buscar por Turma (Find)</h3>
+        <input type="text" id="inputTurma" placeholder="Ex: ADS-2023">
+        <button onclick="buscar()">Buscar</button>
+        <div id="listaAlunos"></div>
+    </div>
+
+    <div class="secao">
+        <h3>Cadastrar Aluno (Insert)</h3>
+        <input type="text" id="nome" placeholder="Nome">
+        <input type="text" id="mat" placeholder="Matrícula">
+        <input type="text" id="turma" placeholder="Turma">
+        <button onclick="cadastrar()">Salvar</button>
+    </div>
+
+    <div class="secao">
+        <h3>Relatórios (Aggregate)</h3>
+        <button onclick="verMedia()">Média Geral Banco de Dados</button>
+    </div>
+
+    <script>
+        // 1. Função de Cadastro (INSERT)
+async function cadastrar() {
+    // Pegamos os valores dos campos do seu HTML
+    const nome = document.getElementById('nome').value;
+    const mat = document.getElementById('mat').value;
+    const turma = document.getElementById('turma').value;
+
+    const aluno = {
+        nome: nome,
+        matricula: mat,
+        turma: turma,
+        // Criamos o objeto disciplinas para bater com o que o Compass mostrou
+        disciplinas: { 
+            "Banco de Dados": 0, 
+            "Programação": 0 
+        }
+    };
+
+    const res = await fetch('/cadastrar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(aluno)
+    });
+    
+    const d = await res.json();
+    alert(d.mensagem);
+}
+
+// 2. Função de Média (AGGREGATE)
+async function verMedia() {
+    const res = await fetch('/media-bd');
+    const d = await res.json();
+    
+    // Verificamos se o MongoDB retornou algum cálculo
+    if (d.length > 0 && d[0].media !== null) {
+        alert(`Média Geral de Banco de Dados: ${d[0].media.toFixed(2)}`);
+    } else {
+        alert("Não há notas suficientes para calcular a média.");
+    }
+}
+    </script>
+</body>
+</html>

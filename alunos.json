@@ -1,0 +1,17 @@
+[
+  { "nome": "Lucas Pereira", "matricula": "2023001", "turma": "ADS-2023", "disciplinas": { "Banco de Dados": 8.5, "Programação": 9.0 } },
+  { "nome": "Fernanda Lima", "matricula": "2023002", "turma": "ADS-2023", "disciplinas": { "Banco de Dados": 7.0, "Programação": 6.5 } },
+  { "nome": "Ricardo Souza", "matricula": "2023003", "turma": "SI-2023", "disciplinas": { "Banco de Dados": 9.5, "Programação": 8.0 } },
+  { "nome": "Mariana Costa", "matricula": "2023004", "turma": "ADS-2023", "disciplinas": { "Banco de Dados": 6.0, "Programação": 7.5 } },
+  { "nome": "Pedro Santos", "matricula": "2023005", "turma": "SI-2023", "disciplinas": { "Banco de Dados": 8.0, "Programação": 8.5 } },
+  { "nome": "Camila Oliveira", "matricula": "2023006", "turma": "ADS-2023", "disciplinas": { "Banco de Dados": 7.5, "Programação": 9.0 } },
+  { "nome": "André Martins", "matricula": "2023007", "turma": "ADS-2023", "disciplinas": { "Banco de Dados": 9.0, "Programação": 9.5 } },
+  { "nome": "Juliana Rocha", "matricula": "2023008", "turma": "SI-2023", "disciplinas": { "Banco de Dados": 5.5, "Programação": 6.0 } },
+  { "nome": "Rafael Gomes", "matricula": "2023009", "turma": "ADS-2023", "disciplinas": { "Banco de Dados": 8.2, "Programação": 7.8 } },
+  { "nome": "Carla Lima", "matricula": "2023010", "turma": "SI-2023", "disciplinas": { "Banco de Dados": 6.5, "Programação": 7.0 } },
+  { "nome": "Diego Fernandes", "matricula": "2023011", "turma": "ADS-2023", "disciplinas": { "Banco de Dados": 9.3, "Programação": 8.9 } },
+  { "nome": "Patrícia Ramos", "matricula": "2023012", "turma": "ADS-2023", "disciplinas": { "Banco de Dados": 5.0, "Programação": 6.0 } },
+  { "nome": "Eduardo Silva", "matricula": "2023013", "turma": "SI-2023", "disciplinas": { "Banco de Dados": 7.8, "Programação": 8.2 } },
+  { "nome": "Bianca Souza", "matricula": "2023014", "turma": "ADS-2023", "disciplinas": { "Banco de Dados": 6.7, "Programação": 7.1 } },
+  { "nome": "Felipe Castro", "matricula": "2023015", "turma": "SI-2023", "disciplinas": { "Banco de Dados": 8.9, "Programação": 9.2 } }
+]
