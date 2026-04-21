@@ -10,16 +10,13 @@ app.use(express.json());
 
 let db;
 
-connect()
-    .then((database) => {
-        db = database;
-        console.log("Banco conectado com sucesso");
-    })
-    .catch((erro) => {
-        console.error("Erro ao conectar no MongoDB:", erro);
-    });
-
-const alunos = () => db.collection("alunos");
+// função para acessar coleção
+const alunos = () => {
+    if (!db) {
+        throw new Error("Banco de dados ainda não conectado");
+    }
+    return db.collection("alunos");
+};
 
 // INSERT - cadastrar aluno novo
 app.post("/alunos", async (req, res) => {
@@ -58,6 +55,7 @@ app.post("/alunos", async (req, res) => {
 
         res.json({ mensagem: "Aluno cadastrado com sucesso" });
     } catch (erro) {
+        console.error("Erro ao cadastrar aluno:", erro);
         res.status(500).json({ mensagem: "Erro ao cadastrar aluno" });
     }
 });
@@ -132,6 +130,7 @@ app.put("/alunos/:nome", async (req, res) => {
 
         res.json({ mensagem: "Nota atualizada com sucesso" });
     } catch (erro) {
+        console.error("Erro ao atualizar nota:", erro);
         res.status(500).json({ mensagem: "Erro ao atualizar nota" });
     }
 });
@@ -157,6 +156,7 @@ app.patch("/alunos/:nome/disciplina", async (req, res) => {
 
         res.json({ mensagem: "Disciplina adicionada com sucesso" });
     } catch (erro) {
+        console.error("Erro ao adicionar disciplina:", erro);
         res.status(500).json({ mensagem: "Erro ao adicionar disciplina" });
     }
 });
@@ -172,6 +172,7 @@ app.delete("/alunos/:nome", async (req, res) => {
 
         res.json({ mensagem: "Aluno removido com sucesso" });
     } catch (erro) {
+        console.error("Erro ao remover aluno:", erro);
         res.status(500).json({ mensagem: "Erro ao remover aluno" });
     }
 });
@@ -197,45 +198,14 @@ app.delete("/alunos/:nome/disciplina/:disciplina", async (req, res) => {
 
         res.json({ mensagem: "Disciplina removida com sucesso" });
     } catch (erro) {
+        console.error("Erro ao remover disciplina:", erro);
         res.status(500).json({ mensagem: "Erro ao remover disciplina" });
-    }
-});
-
-// REPLACE - substituir cadastro completo
-app.put("/replace/:nome", async (req, res) => {
-    try {
-        const { nome, turma, disciplinas } = req.body;
-
-        if (!nome || !turma || !disciplinas || Object.keys(disciplinas).length === 0) {
-            return res.status(400).json({ mensagem: "Novo cadastro inválido" });
-        }
-
-        const resultado = await alunos().replaceOne(
-            { nome: req.params.nome },
-            {
-                nome: nome.trim(),
-                turma: turma.trim(),
-                disciplinas
-            }
-        );
-
-        if (resultado.matchedCount === 0) {
-            return res.status(404).json({ mensagem: "Aluno não encontrado para substituição" });
-        }
-
-        res.json({ mensagem: "Cadastro substituído com sucesso" });
-    } catch (erro) {
-        res.status(500).json({ mensagem: "Erro ao substituir cadastro" });
     }
 });
 
 // AGGREGATE - média por disciplina
 app.get("/media", async (req, res) => {
     try {
-        if (!db) {
-            return res.status(500).json({ mensagem: "Banco ainda não conectado" });
-        }
-
         const resultado = await alunos().aggregate([
             {
                 $match: {
@@ -280,6 +250,18 @@ app.get("/media", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
-});
+async function iniciarServidor() {
+    try {
+        db = await connect();
+        console.log("Banco conectado com sucesso");
+
+        app.listen(PORT, () => {
+            console.log(`Servidor rodando em http://localhost:${PORT}`);
+        });
+    } catch (erro) {
+        console.error("Erro ao conectar no MongoDB:", erro);
+        process.exit(1);
+    }
+}
+
+iniciarServidor();
