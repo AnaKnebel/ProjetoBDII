@@ -18,24 +18,26 @@ const alunos = () => {
     return db.collection("alunos");
 };
 
+// gerar matrícula automática
 async function gerarMatricula() {
-    const ultimoAluno = await alunos()
+    const lista = await alunos()
         .find({ matricula: { $exists: true, $ne: null, $ne: "" } })
-        .sort({ matricula: -1 })
-        .limit(1)
         .toArray();
 
-    if (ultimoAluno.length === 0) {
+    if (lista.length === 0) {
         return "2023001";
     }
 
-    const ultimaMatricula = parseInt(ultimoAluno[0].matricula, 10);
+    let maior = 2023000;
 
-    if (isNaN(ultimaMatricula)) {
-        return "2023001";
-    }
+    lista.forEach(aluno => {
+        const numero = parseInt(aluno.matricula, 10);
+        if (!isNaN(numero) && numero > maior) {
+            maior = numero;
+        }
+    });
 
-    return String(ultimaMatricula + 1);
+    return String(maior + 1);
 }
 
 // INSERT - cadastrar aluno novo
@@ -43,13 +45,20 @@ app.post("/alunos", async (req, res) => {
     try {
         const { nome, turma, disciplinas } = req.body;
 
-        if (!nome || nome.trim() === "" || !turma || turma.trim() === "" || !disciplinas || Object.keys(disciplinas).length === 0) {
+        if (
+            !nome || nome.trim() === "" ||
+            !turma || turma.trim() === "" ||
+            !disciplinas ||
+            Object.keys(disciplinas).length === 0
+        ) {
             return res.status(400).json({ mensagem: "Dados inválidos" });
         }
 
         const nomesDisciplinas = Object.keys(disciplinas);
         const disciplinaInvalida = nomesDisciplinas.some(d => !d || d.trim() === "");
-        const notaInvalida = nomesDisciplinas.some(d => disciplinas[d] === null || disciplinas[d] === "" || isNaN(disciplinas[d]));
+        const notaInvalida = nomesDisciplinas.some(
+            d => disciplinas[d] === null || disciplinas[d] === "" || isNaN(disciplinas[d])
+        );
 
         if (disciplinaInvalida) {
             return res.status(400).json({ mensagem: "Nome da disciplina inválido" });
@@ -71,14 +80,14 @@ app.post("/alunos", async (req, res) => {
 
         await alunos().insertOne({
             nome: nome.trim(),
-            matricula,
+            matricula: matricula,
             turma: turma.trim(),
             disciplinas
         });
 
         res.json({
             mensagem: "Aluno cadastrado com sucesso",
-            matricula
+            matricula: matricula
         });
     } catch (erro) {
         console.error("Erro ao cadastrar aluno:", erro);
@@ -226,6 +235,35 @@ app.delete("/alunos/:nome/disciplina/:disciplina", async (req, res) => {
     } catch (erro) {
         console.error("Erro ao remover disciplina:", erro);
         res.status(500).json({ mensagem: "Erro ao remover disciplina" });
+    }
+});
+
+// REPLACE - substituir cadastro completo
+app.put("/replace/:nome", async (req, res) => {
+    try {
+        const { nome, turma, disciplinas } = req.body;
+
+        if (!nome || !turma || !disciplinas || Object.keys(disciplinas).length === 0) {
+            return res.status(400).json({ mensagem: "Novo cadastro inválido" });
+        }
+
+        const resultado = await alunos().replaceOne(
+            { nome: req.params.nome },
+            {
+                nome: nome.trim(),
+                turma: turma.trim(),
+                disciplinas
+            }
+        );
+
+        if (resultado.matchedCount === 0) {
+            return res.status(404).json({ mensagem: "Aluno não encontrado para substituição" });
+        }
+
+        res.json({ mensagem: "Cadastro substituído com sucesso" });
+    } catch (erro) {
+        console.error("Erro ao substituir cadastro:", erro);
+        res.status(500).json({ mensagem: "Erro ao substituir cadastro" });
     }
 });
 
