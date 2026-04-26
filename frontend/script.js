@@ -334,6 +334,7 @@ function renderizarAlunos(listaAlunos, disciplinaFiltro = "") {
             <div class="card-topo">
                 <div class="card-titulo">
                     <h3>${aluno.nome}</h3>
+                    <p>Matrícula: ${aluno.matricula || "Não informada"}</p>
                     <p>Turma: ${aluno.turma}</p>
                 </div>
 
@@ -387,7 +388,13 @@ async function addAluno() {
             return;
         }
 
-        mostrarToast(dados.mensagem || "Aluno cadastrado com sucesso", "sucesso");
+        mostrarToast(
+            dados.matricula
+                ? `Aluno cadastrado com sucesso. Matrícula: ${dados.matricula}`
+                : (dados.mensagem || "Aluno cadastrado com sucesso"),
+            "sucesso"
+        );
+
         limparCamposCadastro();
         pesquisar();
     } catch (erro) {

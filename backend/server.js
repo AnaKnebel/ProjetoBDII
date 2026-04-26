@@ -18,6 +18,26 @@ const alunos = () => {
     return db.collection("alunos");
 };
 
+async function gerarMatricula() {
+    const ultimoAluno = await alunos()
+        .find({ matricula: { $exists: true, $ne: null, $ne: "" } })
+        .sort({ matricula: -1 })
+        .limit(1)
+        .toArray();
+
+    if (ultimoAluno.length === 0) {
+        return "2023001";
+    }
+
+    const ultimaMatricula = parseInt(ultimoAluno[0].matricula, 10);
+
+    if (isNaN(ultimaMatricula)) {
+        return "2023001";
+    }
+
+    return String(ultimaMatricula + 1);
+}
+
 // INSERT - cadastrar aluno novo
 app.post("/alunos", async (req, res) => {
     try {
@@ -47,13 +67,19 @@ app.post("/alunos", async (req, res) => {
             return res.status(400).json({ mensagem: "Aluno já cadastrado" });
         }
 
+        const matricula = await gerarMatricula();
+
         await alunos().insertOne({
             nome: nome.trim(),
+            matricula,
             turma: turma.trim(),
             disciplinas
         });
 
-        res.json({ mensagem: "Aluno cadastrado com sucesso" });
+        res.json({
+            mensagem: "Aluno cadastrado com sucesso",
+            matricula
+        });
     } catch (erro) {
         console.error("Erro ao cadastrar aluno:", erro);
         res.status(500).json({ mensagem: "Erro ao cadastrar aluno" });
